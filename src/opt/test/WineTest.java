@@ -19,7 +19,7 @@ import java.text.*;
  * @author Hannah Lau
  * @version 1.0
  */
-public class AbaloneTest {
+public class WineTest {
     private static Instance[] instances = initializeInstances();
 
     private static int inputLayer = 7, hiddenLayer = 5, outputLayer = 1, trainingIterations = 1000;

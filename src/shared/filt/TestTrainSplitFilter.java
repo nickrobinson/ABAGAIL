@@ -18,7 +18,6 @@ public class TestTrainSplitFilter implements DataSetFilter {
         this.pctTrain = 1.0 * pctTrain / 100; //
     }
 
-    @Override
     public void filter(DataSet dataSet) {
         int totalInstances = dataSet.getInstances().length;
         int trainInstances = (int) (totalInstances * pctTrain);
