@@ -35,10 +35,15 @@ public class WineTest {
     private static OptimizationAlgorithm[] oa = new OptimizationAlgorithm[3];
     private static String[] oaNames = {"RHC", "SA", "GA"};
     private static String results = "";
-
+    
     private static DecimalFormat df = new DecimalFormat("0.000");
 
     public static void main(String[] args) {
+    	
+    	//Set the number of training iterations
+    	int numIters = Integer.parseInt(args[0]);
+    	trainingIterations = numIters;
+    	
         for(int i = 0; i < oa.length; i++) {
             networks[i] = factory.createClassificationNetwork(
                 new int[] {inputLayer, hiddenLayer, outputLayer});
