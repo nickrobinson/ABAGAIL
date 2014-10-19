@@ -6,7 +6,6 @@ import java.io.*;
 import dist.DiscreteDependencyTree;
 import dist.DiscreteUniformDistribution;
 import dist.Distribution;
-
 import opt.DiscreteChangeOneNeighbor;
 import opt.EvaluationFunction;
 import opt.GenericHillClimbingProblem;
@@ -34,10 +33,15 @@ import shared.FixedIterationTrainer;
  */
 public class CountOnesTest {
     /** The n value */
-    private static final int N = 80;
+    private static int N = 200;
     private static String filename = "/Users/nrobinson/Development/ABAGAIL/logs/count_ones.csv";
 
     public static void main(String[] args) {
+    	
+    	int numItems = Integer.parseInt(args[0]);
+    	int numIters = Integer.parseInt(args[1]);
+    	N = numItems;
+    	
         int[] ranges = new int[N];
         Arrays.fill(ranges, 2);
         EvaluationFunction ef = new CountOnesEvaluationFunction();
@@ -49,8 +53,8 @@ public class CountOnesTest {
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
         ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-
-        int iter = 1;
+        
+        int iter = numIters;
         double rhcStart = System.nanoTime(), rhcEnd, rhcTime;
         RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);
         FixedIterationTrainer fit = new FixedIterationTrainer(rhc, iter);
@@ -58,9 +62,8 @@ public class CountOnesTest {
         rhcEnd = System.nanoTime();
         rhcTime = rhcEnd - rhcStart;
         rhcTime /= Math.pow(10,9);
-        System.out.println("RHC: " + ef.value(rhc.getOptimal()) + "," + rhcTime);
         // Write output to CSV file
-        String rhcResults = "RHC," + iter + "," + ef.value(rhc.getOptimal()) + "," + rhcTime;
+        String rhcResults = N + "," + "RHC," + iter + "," + ef.value(rhc.getOptimal()) + "," + rhcTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + rhcResults);
         }
@@ -75,9 +78,8 @@ public class CountOnesTest {
         saEnd = System.nanoTime();
         saTime = saEnd - saStart;
         saTime /= Math.pow(10,9);
-        System.out.println("SA: " + ef.value(sa.getOptimal()) + "," + saTime);
         // Write output to CSV file
-        String saResults = "SA," + iter + "," + ef.value(sa.getOptimal()) + "," + saTime;
+        String saResults = N + "," + "SA," + iter + "," + ef.value(sa.getOptimal()) + "," + saTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + saResults);
         }
@@ -92,9 +94,8 @@ public class CountOnesTest {
         gaEnd = System.nanoTime();
         gaTime = gaEnd - gaStart;
         gaTime /= Math.pow(10,9);
-        System.out.println("GA: " + ef.value(ga.getOptimal()) + "," + gaTime);
         // Write output to CSV file
-        String gaResults = "GA," + iter + "," + ef.value(ga.getOptimal()) + "," + gaTime;
+        String gaResults = N + "," + "GA," + iter + "," + ef.value(ga.getOptimal()) + "," + gaTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + gaResults);
         }
@@ -109,9 +110,8 @@ public class CountOnesTest {
         mimicEnd = System.nanoTime();
         mimicTime = mimicEnd - mimicStart;
         mimicTime /= Math.pow(10,9);
-        System.out.println("MIMIC: " + ef.value(mimic.getOptimal()) + "," + mimicTime);
         // Write output to CSV file
-        String mimicResults = "MIMIC," + iter + "," + ef.value(mimic.getOptimal()) + "," + mimicTime;
+        String mimicResults = N + "," + "MIMIC," + iter + "," + ef.value(mimic.getOptimal()) + "," + mimicTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + mimicResults);
         }

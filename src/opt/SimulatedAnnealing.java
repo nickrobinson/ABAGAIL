@@ -57,7 +57,8 @@ public class SimulatedAnnealing extends OptimizationAlgorithm {
             curVal = neighVal;
             cur = neigh;
         }
-        t *= cooling;
+        //System.out.format("SA: iter: %f currval: %f\n", t, curVal);
+        t *= cooling; 
         return curVal;
     }
 
