@@ -36,14 +36,27 @@ import shared.FixedIterationTrainer;
  */
 public class TravelingSalesmanTest {
     /** The n value */
-    private static final int N = 50;
+    private static int N = 50;
     
-    private static String filename = "/Users/nrobinson/Development/ABAGAIL/logs/traveling_salesman.csv";
+    private static String filename = "logs/traveling_salesman.csv";
     /**
      * The test main
      * @param args ignored
      */
     public static void main(String[] args) {
+    	if(args.length < 4)
+        {
+            System.err.println("TravelingSalesmanTest <range> <gaIterations> <saIterations> <mimicIterations>\n");
+            System.exit(1);
+        }
+    	
+    	int numItems = Integer.parseInt(args[0]);
+    	int gaIters = Integer.parseInt(args[1]);
+    	int saIters = Integer.parseInt(args[2]);
+    	int mimicIters = Integer.parseInt(args[3]);
+    	
+    	N = numItems;
+    	
         Random random = new Random();
         // create the random points
         double[][] points = new double[N][2];
@@ -59,35 +72,18 @@ public class TravelingSalesmanTest {
         CrossoverFunction cf = new TravelingSalesmanCrossOver(ef);
         HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
         GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
-        
-        int iter = 1;
-        double rhcStart = System.nanoTime(), rhcEnd, rhcTime;
-        RandomizedHillClimbing rhc = new RandomizedHillClimbing(hcp);      
-        FixedIterationTrainer fit = new FixedIterationTrainer(rhc, 200000);
-        fit.train();
-        rhcEnd = System.nanoTime();
-        rhcTime = rhcEnd - rhcStart;
-        rhcTime /= Math.pow(10,9);
-        System.out.println("RHC: " + ef.value(rhc.getOptimal()) + "," + rhcTime);
-        // Write output to CSV file
-        String rhcResults = "RHC," + iter + "," + ef.value(rhc.getOptimal()) + "," + rhcTime;
-        try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
-            writer.append("\n" + rhcResults);
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+       
         
         double saStart = System.nanoTime(), saEnd, saTime;
         SimulatedAnnealing sa = new SimulatedAnnealing(1E12, .95, hcp);
-        fit = new FixedIterationTrainer(sa, 200000);
+        FixedIterationTrainer fit = new FixedIterationTrainer(sa, saIters); //200000
         fit.train();
         saEnd = System.nanoTime();
         saTime = saEnd - saStart;
         saTime /= Math.pow(10,9);
         System.out.println("SA: " + ef.value(sa.getOptimal()) + "," + saTime);
         // Write output to CSV file
-        String saResults = "SA," + iter + "," + ef.value(sa.getOptimal()) + "," + saTime;
+        String saResults = N + "," + "SA," + saIters + "," + ef.value(sa.getOptimal()) + "," + saTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + saResults);
         }
@@ -97,14 +93,14 @@ public class TravelingSalesmanTest {
         
         double gaStart = System.nanoTime(), gaEnd, gaTime;
         StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 150, 20, gap);
-        fit = new FixedIterationTrainer(ga, 1000);
+        fit = new FixedIterationTrainer(ga, gaIters); //1000
         fit.train();
         gaEnd = System.nanoTime();
         gaTime = gaEnd - gaStart;
         gaTime /= Math.pow(10,9);
         System.out.println("GA: " + ef.value(ga.getOptimal()) + "," + gaTime);
         // Write output to CSV file
-        String gaResults = "GA," + iter + "," + ef.value(ga.getOptimal()) + "," + gaTime;
+        String gaResults = N + "," + "GA," + gaIters + "," + ef.value(ga.getOptimal()) + "," + gaTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + gaResults);
         }
@@ -122,14 +118,14 @@ public class TravelingSalesmanTest {
         
         double mimicStart = System.nanoTime(), mimicEnd, mimicTime;
         MIMIC mimic = new MIMIC(200, 100, pop);
-        fit = new FixedIterationTrainer(mimic, 1000);
+        fit = new FixedIterationTrainer(mimic, mimicIters); //1000
         fit.train();
         mimicEnd = System.nanoTime();
         mimicTime = mimicEnd - mimicStart;
         mimicTime /= Math.pow(10,9);
         System.out.println("MIMIC: " + ef.value(mimic.getOptimal()) + "," + mimicTime);
         // Write output to CSV file
-        String mimicResults = "MIMIC," + iter + "," + ef.value(mimic.getOptimal()) + "," + mimicTime;
+        String mimicResults = N + "," + "MIMIC," + mimicIters + "," + ef.value(mimic.getOptimal()) + "," + mimicTime;
         try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
             writer.append("\n" + mimicResults);
         }

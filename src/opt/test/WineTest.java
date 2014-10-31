@@ -36,6 +36,8 @@ public class WineTest {
     private static String[] oaNames = {"RHC", "SA", "GA"};
     private static String results = "";
     
+    private static String filename = "logs/optimize_weights.csv";
+    
     private static DecimalFormat df = new DecimalFormat("0.000");
 
     public static void main(String[] args) {
@@ -79,6 +81,15 @@ public class WineTest {
             end = System.nanoTime();
             testingTime = end - start;
             testingTime /= Math.pow(10,9);
+            
+            // Write output to CSV file
+            String saResults = oaNames[i] + "," + numIters + "," + df.format(correct/(correct+incorrect)*100) + "," + trainingTime;
+            try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
+                writer.append("\n" + saResults);
+            }
+            catch (IOException e) {
+                e.printStackTrace();
+            }
 
             results +=  "\nResults for " + oaNames[i] + ": \nCorrectly classified " + correct + " instances." +
                         "\nIncorrectly classified " + incorrect + " instances.\nPercent correctly classified: "
@@ -90,7 +101,7 @@ public class WineTest {
     }
 
     private static void train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName) {
-        System.out.println("\nError results for " + oaName + "\n---------------------------");
+        //System.out.println("\nError results for " + oaName + "\n---------------------------");
 
         for(int i = 0; i < trainingIterations; i++) {
             oa.train();
@@ -105,7 +116,7 @@ public class WineTest {
                 error += measure.value(output, example);
             }
 
-            System.out.println(df.format(error));
+            //System.out.println(df.format(error));
         }
     }
 

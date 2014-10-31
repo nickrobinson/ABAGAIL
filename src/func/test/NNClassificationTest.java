@@ -1,8 +1,12 @@
 package func.test;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
@@ -24,13 +28,14 @@ import func.nn.backprop.RPROPUpdateRule;
 public class NNClassificationTest {
 	
 	private static DecimalFormat df = new DecimalFormat("0.000");
+	private static String filename = "logs/nn_classification.csv";
 
 	private static Instance[] initializeInstances() {
 
         double[][][] attributes = new double[1599][][];
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(new File("/Users/nrobinson/Development/ABAGAIL/data/winequality-red.csv")));
+            BufferedReader br = new BufferedReader(new FileReader(new File("data/winequality-red.csv")));
 
             for(int i = 0; i < attributes.length; i++) {
                 Scanner scan = new Scanner(br.readLine());
@@ -73,6 +78,7 @@ public class NNClassificationTest {
         
         Instance[] patterns = initializeInstances();
 
+        double bpStart = System.nanoTime(), bpEnd, bpTime;
         BackPropagationNetwork network = factory.createClassificationNetwork(
            new int[] { 7, 5, 1 });
         DataSet set = new DataSet(patterns);
@@ -80,8 +86,9 @@ public class NNClassificationTest {
                new BatchBackPropagationTrainer(set, network,
                    new SumOfSquaresError(), new RPROPUpdateRule()), numIters);
         trainer.train();
-        System.out.println("Convergence in " 
-            + numIters.toString() + " iterations");
+        bpEnd = System.nanoTime();
+        bpTime = bpEnd - bpStart;
+        bpTime /= Math.pow(10,9);
         
         double predicted, actual;
         double start = System.nanoTime(), end, trainingTime, testingTime, correct = 0, incorrect = 0;
@@ -94,6 +101,15 @@ public class NNClassificationTest {
             actual = Double.parseDouble(network.getOutputValues().toString());
 
             double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
+        }
+        
+        // Write output to CSV file
+        String saResults = "NN," + numIters + "," + df.format(correct/(correct+incorrect)*100) + "," + bpTime;
+        try (Writer writer = new BufferedWriter(new FileWriter(filename, true))) {
+            writer.append("\n" + saResults);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
         
         String results = "";
